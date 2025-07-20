@@ -5,8 +5,8 @@ from .models import Book
 def book_list(request):
       """Retrieves all books and renders a template displaying the list."""
       books = Book.objects.all()  
-      context = {'book_list': books}  
-      return render(request, 'books/book_list.html', context)
+      context = {'list_book': books}  
+      return render(request, 'list_books.html', context)
 
 from django.views.generic import DetailView
 from .models import Book
