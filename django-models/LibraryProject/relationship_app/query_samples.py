@@ -4,5 +4,6 @@ from relationship_app.models import Author,Book,Library,Librarian
 
 books = Library.objects.get(name=library_name)
 books.all()
-all_books_list = Library.objects.all()
-librarian = Librarian.objects.get(name='')
+
+book = Author.objects.get(name=author_name)
+objects.filter(author=author)
