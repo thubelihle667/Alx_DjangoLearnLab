@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
 from django.views.generic.detail import DetailView
 from .models import Author, Book, Library, Librarian
-from django.contrib.auth.views import LoginView
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
+from django.views.generic import CreateView
 
 def list_books(request):
     books = Book.objects.all()
@@ -12,4 +14,11 @@ class LibraryDetailView(DetailView):
     model = Library
     template_name = 'relationship_app/library_detail.html'
     context_object_name = 'library'
+
+class SignUpView(CreateView):
+    form_class = UserCreationForm
+    success_url = reverse_lazy('login')
+    template_name = 'register/register.html'
+
+
 
