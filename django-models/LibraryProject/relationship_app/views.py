@@ -2,7 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.decorators import permission_required
 from django.views.generic.detail import DetailView
-from .models import Author, Book, Library, Librarian
+from .models import Library
+from .models import Author
+from .models import Librarian
+from .models import Book
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic import CreateView
@@ -29,9 +32,6 @@ def register(request):
             return redirect('login')
     return render(request, 'relationship_app/register.html', {'form': form})
 
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import UserProfile
 
 # Helper functions
 def is_admin(user):
