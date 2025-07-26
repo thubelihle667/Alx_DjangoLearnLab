@@ -11,6 +11,7 @@ admin.site.register(Book, BookAdmin)
 
 # Custom User Admin
 class CustomUserAdmin(UserAdmin):
+    model = CustomUser
     fieldsets = UserAdmin.fieldsets + (
         (None, {'fields': ('date_of_birth', 'profile_photo',)}),
     )
