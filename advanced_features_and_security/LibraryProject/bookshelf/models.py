@@ -17,7 +17,7 @@ class CustomUser(AbstractUser):
 
     objects = UserManager()
 
-class UserManager(BaseUserManager):
+class CustomUserManager(BaseUserManager):
     def create_user(self, email, password):
         if not email:
             raise ValueError("Users must have an email")
