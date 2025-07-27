@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'bookshelf.apps.BookshelfConfig',
     'relationship_app',
     'csp',
+    'sslserver',
 ]
 
 MIDDLEWARE = [
@@ -136,3 +137,7 @@ MIDDLEWARE += [
 CSP_DEFAULT_SRC = ("'self'",)
 CSP_SCRIPT_SRC = ("'self'", 'https://trusted.cdn.com',)
 CSP_STYLE_SRC = ("'self'", 'https://trusted.cdn.com',)
+SECURE_SSL_REDIRECT = True  # Redirect HTTP to HTTPS
+SECURE_HSTS_SECONDS = 31536000  # Instruct browsers to use HTTPS for 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply to all subdomains
+SECURE_HSTS_PRELOAD = True  # Allow domain to be preloaded in browsers
