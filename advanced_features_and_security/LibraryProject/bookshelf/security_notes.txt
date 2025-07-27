@@ -1,0 +1,6 @@
+- DEBUG disabled in production.
+- CSRF and Session cookies are secured with HTTPS.
+- CSP headers configured to restrict script and style sources.
+- X-Frame-Options set to 'DENY' to prevent clickjacking.
+- All forms are protected with CSRF tokens.
+- Inputs are validated and sanitized using Django Forms.
