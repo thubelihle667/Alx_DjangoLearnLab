@@ -1,7 +1,7 @@
 from rest_framewrok import serializers
 from .models import Author,Book
 
-class BookSerializer(serializer.ModelSerializer):
+class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = ['title','publication_year','author']
