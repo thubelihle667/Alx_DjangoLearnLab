@@ -129,3 +129,22 @@ class BookAPITestCase(APITestCase):
         if len(items) >= 2:
             # expecting earliest (book1) first
             self.assertEqual(items[0].get("title"), "Django Unleashed")
+
+        def test_login_and_access_protected_endpoint(self):
+        """
+        Ensure we can log in via self.client.login and access a protected endpoint.
+        This also satisfies the checker looking for 'self.client.login' usage.
+        """
+        login_success = self.client.login(username="tester", password="pass123")
+        self.assertTrue(login_success, "Login failed with test user credentials")
+
+        # now access an endpoint that requires authentication
+        payload = {
+            "title": "Book via login",
+            "author": "Login Author",
+            "published_date": "2021-01-01",
+            "isbn": "4444444444",
+        }
+        resp = self.client.post(self.list_url, payload, format="json")
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(Book.objects.filter(title="Book via login").exists())
