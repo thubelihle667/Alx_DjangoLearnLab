@@ -7,7 +7,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Post, Comment
 from .forms import PostForm, CommentForm
-
+from django.db.models import Q
 
 # Create your views here.
 def register(request):
@@ -101,3 +101,12 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def get_success_url(self):
         return self.object.post.get_absolute_urls()
 
+def search_posts(request):
+    query = request.GET.get('q')
+    if query:
+        post = Post.objects.filter(
+            Q(title_icontains=query) | Q(content_icontains=query) | Q(tags_name_icontains=query)
+        ).distinct()
+    else:
+        posts = Post.objects.all()
+    return render(request, 'blog/search_result.html', {'posts': posts})

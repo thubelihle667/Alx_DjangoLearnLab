@@ -31,3 +31,12 @@
     <script src="{% static 'js/scripts.js' %}"></script>
 </body>
 </html>
+
+<header>
+    <!-- other header content -->
+    <form method="get" action="{% url 'search_posts' %}">
+        <input type="search" name="q" placeholder="Search posts...">
+        <button type="submit">Search</button>
+    </form>
+</header>
+
