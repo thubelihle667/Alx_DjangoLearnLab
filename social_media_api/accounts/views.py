@@ -6,7 +6,8 @@ from rest_framework import permissions, status, generics
 from .serializers import (
     RegisterSerializer, LoginSerializer, UserPublicSerializer, ProfileUpdateSerializer
 )
-from .models import User
+from .models import User, CustomUser
+from django.shortcuts import get_object_or_404
 
 from .serializers import UserMiniSerializer
 
@@ -45,50 +46,21 @@ class ProfileView(generics.RetrieveUpdateAPIView):
     def put(self, request, *args, **kwargs):
         return super().put(request, *args, **kwargs)
     
-class FollowUserView(APIView):
+class FollowUserView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
+    queryset = CustomUser.objects.all()
 
-    def post(self, request, user_id: int):
-        if request.user.id == user_id:
-            return Response({"detail": "You cannot follow yourself."},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            target = User.objects.get(pk=user_id)
-        except User.DoesNotExist:
-            return Response({"detail": "User not found."},
-                            status=status.HTTP_404_NOT_FOUND)
-
-        if request.user.following.filter(pk=target.pk).exists():
-            # Idempotent
-            data = UserMiniSerializer(target, context={"request": request}).data
-            return Response({"detail": "Already following.", "user": data},
-                            status=status.HTTP_200_OK)
-
-        request.user.following.add(target)
-        data = UserMiniSerializer(target, context={"request": request}).data
-        return Response({"detail": "Followed successfully.", "user": data},
-                        status=status.HTTP_201_CREATED)
+    def post(self, request, user_id):
+        user_to_follow = get_object_or_404(CustomUser, id=user_id)
+        request.user.following.add(user_to_follow)
+        return Response({"detail": f"You are now following {user_to_follow.username}"}, status=status.HTTP_200_OK)
 
 
-class UnfollowUserView(APIView):
+class UnfollowUserView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
+    queryset = CustomUser.objects.all()  
 
-    def delete(self, request, user_id: int):
-        if request.user.id == user_id:
-            return Response({"detail": "You cannot unfollow yourself."},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            target = User.objects.get(pk=user_id)
-        except User.DoesNotExist:
-            return Response({"detail": "User not found."},
-                            status=status.HTTP_404_NOT_FOUND)
-
-        if request.user.following.filter(pk=target.pk).exists():
-            request.user.following.remove(target)
-            return Response(status=status.HTTP_204_NO_CONTENT)
-
-        # Idempotent
-        return Response({"detail": "You were not following this user."},
-                        status=status.HTTP_200_OK)
+    def post(self, request, user_id):
+        user_to_unfollow = get_object_or_404(CustomUser, id=user_id)
+        request.user.following.remove(user_to_unfollow)
+        return Response({"detail": f"You have unfollowed {user_to_unfollow.username}"}, status=status.HTTP_200_OK)
