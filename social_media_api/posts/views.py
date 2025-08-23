@@ -4,6 +4,7 @@ from .serializers import PostSerializer, CommentSerializer
 from .permissions import IsAuthorOrReadOnly
 from django.conf import settings
 from django.db.models import QuerySet
+from rest_framework.response import Response
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().order_by("-created_at")
@@ -27,11 +28,7 @@ class FeedView(generics.ListAPIView):
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self) -> QuerySet:
-        user = self.request.user
-        following_ids = user.following.values_list("id", flat=True)
-        qs = (Post.objects
-              .filter(author_id__in=following_ids)
-              .select_related("author")
-              .order_by("-created_at"))
-        return qs
+    def get_queryset(self):
+        following_users = self.request.user.following.all()
+        return Post.objects.filter(author__in=following_users).order_by('-created_at')
+
