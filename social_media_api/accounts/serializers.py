@@ -21,7 +21,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         Token.objects.create(user=user)
         return user
 
-
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
@@ -37,3 +36,35 @@ class LoginSerializer(serializers.Serializer):
         # Return token for the user
         token, _ = Token.objects.get_or_create(user=validated_data['user'])
         return token
+
+class UserPublicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'bio', 'profile_picture']
+
+class ProfileUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['bio', 'profile_picture']
+
+class UserMiniSerializer(serializers.ModelSerializer):
+    followers_count = serializers.SerializerMethodField()
+    following_count = serializers.SerializerMethodField()
+    is_following = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ["id", "username", "first_name", "last_name",
+                  "followers_count", "following_count", "is_following"]
+
+    def get_followers_count(self, obj):
+        return obj.followers.count()
+
+    def get_following_count(self, obj):
+        return obj.following.count()
+
+    def get_is_following(self, obj):
+        request = self.context.get("request")
+        if request and request.user.is_authenticated and request.user != obj:
+            return request.user.following.filter(pk=obj.pk).exists()
+        return False
