@@ -41,11 +41,9 @@ class FeedView(generics.ListAPIView):
 
 class LikePostView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
-    queryset = Post.objects.all() 
 
     def post(self, request, pk):
-        post = self.get_object()
-        # idempotent: if already liked, return 200
+        post = get_object_or_404(Post, pk=pk)  # <- use this
         like, created = Like.objects.get_or_create(user=request.user, post=post)
         if created and post.author != request.user:
             Notification.objects.create(
@@ -62,9 +60,8 @@ class LikePostView(generics.GenericAPIView):
 
 class UnlikePostView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
-    queryset = Post.objects.all()
 
     def delete(self, request, pk):
-        post = self.get_object()
+        post = get_object_or_404(Post, pk=pk)  # <- use this
         Like.objects.filter(user=request.user, post=post).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
