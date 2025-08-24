@@ -68,3 +68,5 @@ class UserMiniSerializer(serializers.ModelSerializer):
         if request and request.user.is_authenticated and request.user != obj:
             return request.user.following.filter(pk=obj.pk).exists()
         return False
+
+    

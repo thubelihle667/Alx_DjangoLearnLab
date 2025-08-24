@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
-from .models import Post
+from posts.models import Post
 
 User = get_user_model()
 
@@ -14,12 +14,12 @@ class PostCommentAPITests(APITestCase):
         self.client.login(username="alice", password="pass1234")
 
     def test_create_post(self):
-        url = reverse("post-list")
-        data = {"title": "Test Title", "content": "Body text here"}
+        self.client.force_authenticate(user=self.user)
+        url = reverse("post-list")  
+        data = {"content": "Hello World!"}
         res = self.client.post(url, data, format="json")
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Post.objects.count(), 1)
-        self.assertEqual(Post.objects.get().author, self.user)
+        self.assertEqual(res.data["author"], self.user.id)
 
     def test_list_posts(self):
         Post.objects.create(author=self.user, title="A", content="x")

@@ -2,17 +2,23 @@ from rest_framework import serializers
 from .models import Post, Comment
 
 class PostSerializer(serializers.ModelSerializer):
-    author = serializers.ReadOnlyField(source="author.username")
-    comment_count = serializers.IntegerField(source="comments.count", read_only=True)
+    comment_count = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Post
         fields = [
-            "id", "author", "title", "content",
-            "created_at", "updated_at",
+            "id",
+            "title",
+            "content",
+            "author",
+            "created_at",
+            "updated_at",
             "comment_count",
         ]
-        read_only_fields = ["id", "author", "created_at", "updated_at", "comment_count"]
+        read_only_fields = ["id", "author", "created_at", "updated_at"]
+
+    def get_comment_count(self, obj):
+        return obj.comments.count()
 
     def validate_title(self, value):
         if not value.strip():
