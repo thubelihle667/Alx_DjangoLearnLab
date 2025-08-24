@@ -47,19 +47,11 @@ from .models import Post, Like
 from notifications.models import Notification
 
 class LikePostView(generics.GenericAPIView):
-    """
-    Like a post. Creates a Like object and a notification for the post author.
-    """
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk):
-        # Get the post using get_object_or_404 (checker requires this exact syntax)
-        post = get_object_or_404(Post, pk=pk)
-
-        # Idempotent like: only create if not exists
+        post = generics.get_object_or_404(Post, pk=pk)
         like, created = Like.objects.get_or_create(user=request.user, post=post)
-
-        # Only notify if newly created and not liking own post
         if created and post.author != request.user:
             Notification.objects.create(
                 recipient=post.author,
@@ -69,22 +61,14 @@ class LikePostView(generics.GenericAPIView):
                 target_object_id=post.id,
                 metadata={"post_id": post.id}
             )
-
         status_code = status.HTTP_201_CREATED if created else status.HTTP_200_OK
         return Response({"detail": "Liked"}, status=status_code)
 
 
 class UnlikePostView(generics.GenericAPIView):
-    """
-    Unlike a post. Deletes the Like object if it exists.
-    """
     permission_classes = [permissions.IsAuthenticated]
 
     def delete(self, request, pk):
-        # Get the post using get_object_or_404
-        post = get_object_or_404(Post, pk=pk)
-
-        # Delete the like if exists
+        post = generics.get_object_or_404(Post, pk=pk)
         Like.objects.filter(user=request.user, post=post).delete()
-
         return Response({"detail": "Unliked"}, status=status.HTTP_204_NO_CONTENT)
