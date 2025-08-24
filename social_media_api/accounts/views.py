@@ -13,6 +13,7 @@ from django.contrib.contenttypes.models import ContentType
 from .serializers import UserMiniSerializer
 
 User = get_user_model()
+CustomUser = User
 
 class RegisterView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -49,7 +50,7 @@ class ProfileView(generics.RetrieveUpdateAPIView):
     
 class FollowUserView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()
 
     def post(self, request, user_id):
         user_to_follow = get_object_or_404(User, id=user_id)
@@ -82,7 +83,7 @@ class FollowUserView(generics.GenericAPIView):
 
 class UnfollowUserView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
-    queryset = User.objects.all()  
+    queryset = CustomUser.objects.all()  
 
     def delete(self, request, user_id):
         user_to_unfollow = get_object_or_404(User, id=user_id)
